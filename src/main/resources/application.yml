@@ -26,7 +26,7 @@ spring:
 
   # Database Datasource & Connection Pooling
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:refind_db}?sslmode=${SSL_MODE:disable}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:refind_db}?sslmode=${SSL_MODE:disable}
     username: ${DB_USER:refind}
     password: ${DB_PASSWORD:refind}
     driver-class-name: org.postgresql.Driver
@@ -76,7 +76,7 @@ spring:
   # Redis (Upstash compatible)
   data:
     redis:
-      url: ${REDIS_URL:redis://localhost:6380}
+      url: ${REDIS_URL:redis://localhost:6379}
       ssl:
         enabled: ${REDIS_SSL_ENABLED:false}
 
