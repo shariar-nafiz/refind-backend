@@ -33,16 +33,20 @@ cd refind-backend
 
 ### 2. Configure Database & Environment
 
-Configure your database connection settings in `src/main/resources/application.properties` or via environment variables:
+Configure your database connection settings in `src/main/resources/application.yml` or via environment variables:
 
-```properties
-spring.application.name=refind
-
-spring.datasource.url=jdbc:postgresql://localhost:5432/refind_db
-spring.datasource.username=postgres
-spring.datasource.password=your_password
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
+```yaml
+spring:
+  application:
+    name: refind
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/refind_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 ```
 
 ### 3. Build the Application
