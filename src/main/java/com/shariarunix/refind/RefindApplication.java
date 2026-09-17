@@ -1,5 +1,6 @@
 package com.shariarunix.refind;
 
+import com.shariarunix.refind.config.DotenvLoader;
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,7 +16,7 @@ public class RefindApplication {
 	}
 
 	public static void main(String[] args) {
-		com.shariarunix.refind.config.DotenvLoader.load();
+		DotenvLoader.load();
 		SpringApplication.run(RefindApplication.class, args);
 	}
 
