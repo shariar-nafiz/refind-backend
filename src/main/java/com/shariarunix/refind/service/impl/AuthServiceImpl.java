@@ -37,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
+    private final com.shariarunix.refind.service.RedisTokenService redisTokenService;
 
     @Value("${app.admin.bootstrap-emails:}")
     private String bootstrapEmails;
@@ -77,6 +78,8 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = tokenProvider.generateAccessToken(user.getId(), username, user.getRole().name());
         String refreshToken = tokenProvider.generateRefreshToken(user.getId());
 
+        redisTokenService.storeRefreshToken(user.getId(), refreshToken, tokenProvider.getRefreshTokenExpirationMs());
+
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -116,6 +119,8 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = tokenProvider.generateAccessToken(user.getId(), username, role);
         String refreshToken = tokenProvider.generateRefreshToken(user.getId());
 
+        redisTokenService.storeRefreshToken(user.getId(), refreshToken, tokenProvider.getRefreshTokenExpirationMs());
+
         return AuthResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -134,6 +139,11 @@ public class AuthServiceImpl implements AuthService {
         }
 
         Long userId = tokenProvider.getUserIdFromToken(token);
+
+        if (!redisTokenService.validateRefreshToken(userId, token)) {
+            throw new BadRequestException("Refresh token has expired or been revoked. Please sign in again.");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BadRequestException("User not found for token"));
 
@@ -145,6 +155,8 @@ public class AuthServiceImpl implements AuthService {
         String newAccessToken = tokenProvider.generateAccessToken(user.getId(), username, user.getRole().name());
         String newRefreshToken = tokenProvider.generateRefreshToken(user.getId());
 
+        redisTokenService.storeRefreshToken(user.getId(), newRefreshToken, tokenProvider.getRefreshTokenExpirationMs());
+
         return AuthResponse.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(newRefreshToken)
@@ -152,6 +164,19 @@ public class AuthServiceImpl implements AuthService {
                 .expiresIn(tokenProvider.getAccessTokenExpirationMs() / 1000)
                 .user(mapToUserProfile(user))
                 .build();
+    }
+
+    @Override
+    public void logout(String bearerToken, Long userId) {
+        if (StringUtils.hasText(bearerToken)) {
+            String token = bearerToken.startsWith("Bearer ") ? bearerToken.substring(7) : bearerToken;
+            long remainingTtl = tokenProvider.getRemainingExpirationMs(token);
+            redisTokenService.blacklistToken(token, remainingTtl);
+        }
+        if (userId != null) {
+            redisTokenService.revokeRefreshToken(userId);
+        }
+        log.info("User ID: {} successfully logged out and tokens revoked", userId);
     }
 
     private Role determineRoleForEmail(String email) {

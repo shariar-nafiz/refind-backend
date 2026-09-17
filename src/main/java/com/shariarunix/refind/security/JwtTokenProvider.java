@@ -26,6 +26,7 @@ public class JwtTokenProvider {
     @Value("${app.security.jwt.access-token-expiration-ms:86400000}")
     private long accessTokenExpirationMs;
 
+    @Getter
     @Value("${app.security.jwt.refresh-token-expiration-ms:604800000}")
     private long refreshTokenExpirationMs;
 
@@ -70,6 +71,26 @@ public class JwtTokenProvider {
                 .getPayload();
 
         return Long.parseLong(claims.getSubject());
+    }
+
+    public Date getExpirationDateFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.getExpiration();
+    }
+
+    public long getRemainingExpirationMs(String token) {
+        try {
+            Date expiration = getExpirationDateFromToken(token);
+            long diff = expiration.getTime() - System.currentTimeMillis();
+            return Math.max(diff, 0);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public boolean validateToken(String token) {

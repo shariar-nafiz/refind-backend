@@ -6,13 +6,16 @@ import com.shariarunix.refind.dto.auth.RefreshTokenRequest;
 import com.shariarunix.refind.dto.auth.RegisterRequest;
 import com.shariarunix.refind.dto.common.ApiResponse;
 import com.shariarunix.refind.service.AuthService;
+import com.shariarunix.refind.security.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,5 +49,21 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> refreshToken(@Valid @RequestBody RefreshTokenRequest request, HttpServletRequest httpRequest) {
         AuthResponse response = authService.refreshToken(request);
         return ResponseEntity.ok(ApiResponse.success("Token refreshed successfully", response, httpRequest.getRequestURI()));
+    }
+
+    @PostMapping("/logout")
+    @Operation(
+            summary = "Logout user",
+            description = "Blacklists the current JWT access token and revokes the active refresh token in Redis.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            HttpServletRequest httpRequest
+    ) {
+        String bearerToken = httpRequest.getHeader("Authorization");
+        Long userId = userPrincipal != null ? userPrincipal.getId() : null;
+        authService.logout(bearerToken, userId);
+        return ResponseEntity.ok(ApiResponse.ok("Logged out successfully", httpRequest.getRequestURI()));
     }
 }
