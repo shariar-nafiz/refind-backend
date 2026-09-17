@@ -7,6 +7,7 @@ import com.shariarunix.refind.entity.User;
 import com.shariarunix.refind.exception.BadRequestException;
 import com.shariarunix.refind.exception.ResourceNotFoundException;
 import com.shariarunix.refind.repository.UserRepository;
+import com.shariarunix.refind.service.RedisTokenService;
 import com.shariarunix.refind.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RedisTokenService redisTokenService;
 
     @Override
     @Transactional(readOnly = true)
@@ -71,7 +73,8 @@ public class UserServiceImpl implements UserService {
 
         user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
-        log.info("Changed password for user ID: {}", user.getId());
+        redisTokenService.revokeRefreshToken(user.getId());
+        log.info("Changed password and revoked active refresh tokens for user ID: {}", user.getId());
     }
 
     private User getUserOrThrow(Long id) {
