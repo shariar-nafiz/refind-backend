@@ -12,14 +12,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -60,5 +64,16 @@ public class UserController {
     ) {
         userService.changePassword(userPrincipal.getId(), request);
         return ResponseEntity.ok(ApiResponse.ok("Password updated successfully", httpRequest.getRequestURI()));
+    }
+
+    @PostMapping(value = "/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload and update user profile avatar", description = "Uploads an avatar image (JPEG, PNG, WebP) and updates the current user's profile avatar URL.")
+    public ResponseEntity<ApiResponse<UserProfileResponse>> uploadAvatar(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest httpRequest
+    ) {
+        UserProfileResponse response = userService.uploadAvatar(userPrincipal.getId(), file);
+        return ResponseEntity.ok(ApiResponse.success("Avatar updated successfully", response, httpRequest.getRequestURI()));
     }
 }

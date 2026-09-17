@@ -6,7 +6,9 @@ import com.shariarunix.refind.dto.user.UserProfileResponse;
 import com.shariarunix.refind.entity.User;
 import com.shariarunix.refind.exception.BadRequestException;
 import com.shariarunix.refind.exception.ResourceNotFoundException;
+import com.shariarunix.refind.dto.media.MediaResponse;
 import com.shariarunix.refind.repository.UserRepository;
+import com.shariarunix.refind.service.MediaService;
 import com.shariarunix.refind.service.RedisTokenService;
 import com.shariarunix.refind.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -24,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisTokenService redisTokenService;
+    private final MediaService mediaService;
 
     @Override
     @Transactional(readOnly = true)
@@ -75,6 +79,17 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         redisTokenService.revokeRefreshToken(user.getId());
         log.info("Changed password and revoked active refresh tokens for user ID: {}", user.getId());
+    }
+
+    @Override
+    @Transactional
+    public UserProfileResponse uploadAvatar(Long currentUserId, MultipartFile file) {
+        User user = getUserOrThrow(currentUserId);
+        MediaResponse mediaResponse = mediaService.uploadMedia(file, user.getId(), "avatars");
+        user.setAvatarUrl(mediaResponse.getFileUrl());
+        user = userRepository.save(user);
+        log.info("Updated avatar for user ID: {} to {}", user.getId(), user.getAvatarUrl());
+        return mapToUserProfile(user);
     }
 
     private User getUserOrThrow(Long id) {
