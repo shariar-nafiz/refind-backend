@@ -112,9 +112,8 @@ app:
 # Push Notifications (Firebase Cloud Messaging)
 # ===================================================================
 firebase:
-  fcm:
-    credentials-path: ${FIREBASE_CREDENTIALS_PATH:firebase-service-account.json}
-    credentials-json: ${FIREBASE_CONFIG_JSON:}
+  path: ${FIREBASE_CREDENTIALS_PATH:firebase-service-account.json}
+  json: ${FIREBASE_CONFIG_JSON:}
   client-api-key: ${FIREBASE_CLIENT_API_KEY:}
 
 # ===================================================================
