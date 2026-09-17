@@ -4,7 +4,7 @@ import com.shariarunix.refind.dto.common.ApiResponse;
 import com.shariarunix.refind.dto.user.ChangePasswordRequest;
 import com.shariarunix.refind.dto.user.UpdateProfileRequest;
 import com.shariarunix.refind.dto.user.UserProfileResponse;
-import com.shariarunix.refind.security.CustomUserDetails;
+import com.shariarunix.refind.security.UserPrincipal;
 import com.shariarunix.refind.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -33,32 +33,32 @@ public class UserController {
     @GetMapping("/me")
     @Operation(summary = "Get current authenticated user profile")
     public ResponseEntity<ApiResponse<UserProfileResponse>> getCurrentUser(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             HttpServletRequest httpRequest
     ) {
-        UserProfileResponse response = userService.getCurrentUserProfile(userDetails.getId());
+        UserProfileResponse response = userService.getCurrentUserProfile(userPrincipal.getId());
         return ResponseEntity.ok(ApiResponse.success("User profile retrieved successfully", response, httpRequest.getRequestURI()));
     }
 
     @PutMapping("/me")
     @Operation(summary = "Update current user profile information (full name, phone, avatar)")
     public ResponseEntity<ApiResponse<UserProfileResponse>> updateProfile(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @Valid @RequestBody UpdateProfileRequest request,
             HttpServletRequest httpRequest
     ) {
-        UserProfileResponse response = userService.updateProfile(userDetails.getId(), request);
+        UserProfileResponse response = userService.updateProfile(userPrincipal.getId(), request);
         return ResponseEntity.ok(ApiResponse.success("User profile updated successfully", response, httpRequest.getRequestURI()));
     }
 
     @PatchMapping("/me/password")
     @Operation(summary = "Change current user password")
     public ResponseEntity<ApiResponse<Void>> changePassword(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @Valid @RequestBody ChangePasswordRequest request,
             HttpServletRequest httpRequest
     ) {
-        userService.changePassword(userDetails.getId(), request);
+        userService.changePassword(userPrincipal.getId(), request);
         return ResponseEntity.ok(ApiResponse.ok("Password updated successfully", httpRequest.getRequestURI()));
     }
 }

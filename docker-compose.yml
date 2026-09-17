@@ -1,0 +1,46 @@
+name: refind
+
+services:
+  refind-db:
+    image: postgis/postgis:17-3.5
+    container_name: refind-db
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${DB_PORT:-5435}:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER:-refind}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-refind}
+      POSTGRES_DB: ${DB_NAME:-refind_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - refind-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-refind} -d ${DB_NAME:-refind_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  refind-redis:
+    image: redis:7-alpine
+    container_name: refind-redis
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - refind-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  refind-net:
+    driver: bridge

@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Getter
-public class CustomUserDetails implements UserDetails {
+public class UserPrincipal implements UserDetails {
 
     private final Long id;
     private final String email;
@@ -20,7 +20,7 @@ public class CustomUserDetails implements UserDetails {
     private final UserStatus status;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(User user) {
+    public UserPrincipal(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.phone = user.getPhone();

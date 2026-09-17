@@ -11,7 +11,7 @@ import com.shariarunix.refind.entity.enums.UserStatus;
 import com.shariarunix.refind.exception.BadRequestException;
 import com.shariarunix.refind.exception.UserAccountDisabledException;
 import com.shariarunix.refind.repository.UserRepository;
-import com.shariarunix.refind.security.CustomUserDetails;
+import com.shariarunix.refind.security.UserPrincipal;
 import com.shariarunix.refind.security.JwtTokenProvider;
 import com.shariarunix.refind.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -98,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(identifier, request.getPassword())
         );
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        UserPrincipal userDetails = (UserPrincipal) authentication.getPrincipal();
 
         if (userDetails.getStatus() == UserStatus.BLOCKED) {
             throw new UserAccountDisabledException("This account has been blocked. Please contact support.");
