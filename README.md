@@ -6,8 +6,12 @@ Backend service for **ReFind**, a lost and found platform designed to connect pe
 
 - **Language:** Java 21
 - **Framework:** Spring Boot 4.x
-- **Data & Persistence:** Spring Data JPA, PostgreSQL
-- **Security:** Spring Security
+- **Data & Persistence:** Spring Data JPA, PostgreSQL, Flyway Migrations
+- **Cache & Key-Value:** Upstash Redis (Spring Data Redis)
+- **Security:** Spring Security (JWT)
+- **Storage:** Local Filesystem with configurable media upload handlers
+- **Notifications:** Firebase Cloud Messaging (FCM) & Resend (Email)
+- **Monitoring:** Spring Boot Actuator & Prometheus
 - **API Documentation:** Springdoc OpenAPI (Swagger UI)
 - **Build Tool:** Gradle (Kotlin DSL)
 
@@ -31,23 +35,20 @@ git clone https://github.com/shariar-nafiz/refind-backend.git
 cd refind-backend
 ```
 
-### 2. Configure Database & Environment
+### 2. Configure Environment Variables
 
-Configure your database connection settings in `src/main/resources/application.yml` or via environment variables:
+Copy the `.env.example` template to `.env` (or set the corresponding environment variables in your deployment environment):
 
-```yaml
-spring:
-  application:
-    name: refind
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/refind_db}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+```bash
+cp .env.example .env
 ```
+
+Key environment variables:
+- **Database:** `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SSL_MODE`
+- **Redis (Upstash):** `REDIS_URL`, `REDIS_SSL_ENABLED`
+- **Storage:** `UPLOAD_DIR`, `UPLOAD_ITEMS_DIR`, `UPLOAD_AVATARS_DIR`
+- **Security:** `JWT_SECRET`, `JWT_ACCESS_EXPIRATION_MS`, `JWT_REFRESH_EXPIRATION_MS`
+- **Notifications:** `FIREBASE_CREDENTIALS_PATH`, `RESEND_API_KEY`
 
 ### 3. Build the Application
 

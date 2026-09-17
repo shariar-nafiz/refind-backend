@@ -48,3 +48,7 @@ Thumbs.db
 .env
 application-local.properties
 application-local.yml
+firebase-service-account.json
+
+# Local Uploads
+uploads/
