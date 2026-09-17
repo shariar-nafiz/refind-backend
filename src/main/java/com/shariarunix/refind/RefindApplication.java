@@ -15,6 +15,7 @@ public class RefindApplication {
 	}
 
 	public static void main(String[] args) {
+		com.shariarunix.refind.config.DotenvLoader.load();
 		SpringApplication.run(RefindApplication.class, args);
 	}
 
