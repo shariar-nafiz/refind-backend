@@ -2,16 +2,22 @@ package com.shariarunix.refind.entity;
 
 import com.shariarunix.refind.entity.enums.Role;
 import com.shariarunix.refind.entity.enums.UserStatus;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -46,4 +52,21 @@ public class User extends BaseEntity {
 
     @Column(name = "avatar_url", length = 500)
     private String avatarUrl;
+
+    @Column(name = "bio", length = 500)
+    private String bio;
+
+    @Column(name = "secondary_phone", length = 50)
+    private String secondaryPhone;
+
+    @Column(name = "is_profile_completed", nullable = false)
+    @Builder.Default
+    private boolean isProfileCompleted = false;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<UserAddress> addresses = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserPreference preferences;
 }
