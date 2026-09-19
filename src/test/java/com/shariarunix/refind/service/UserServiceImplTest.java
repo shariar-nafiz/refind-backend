@@ -260,4 +260,19 @@ class UserServiceImplTest {
         assertThat(response.getStatus()).isEqualTo(UserStatus.BLOCKED);
         verify(redisTokenService).revokeRefreshToken(1L);
     }
+
+    @Test
+    void getAllUsersForAdmin_SanitizesSortAndPaginates() {
+        when(userRepository.searchUsers(eq("test"), eq(UserStatus.ACTIVE), eq(Role.ROLE_USER), any(org.springframework.data.domain.Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(sampleUser), PageRequest.of(0, 20), 1));
+        when(userAddressRepository.findByUserIdOrderByIsDefaultDescCreatedAtDesc(1L)).thenReturn(List.of());
+
+        Page<AdminUserResponse> result = userService.getAllUsersForAdmin(
+                "test", UserStatus.ACTIVE, Role.ROLE_USER, -1, 500, "invalidField", "asc"
+        );
+
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getFullName()).isEqualTo("Test User");
+    }
 }

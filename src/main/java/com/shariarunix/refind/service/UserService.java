@@ -53,7 +53,15 @@ public interface UserService {
     void deactivateAccount(Long currentUserId, DeactivateAccountRequest request, String bearerToken);
 
     // Administrative Moderation Operations
-    Page<AdminUserResponse> getAllUsersForAdmin(String query, UserStatus status, Role role, Pageable pageable);
+    Page<AdminUserResponse> getAllUsersForAdmin(
+            String query,
+            UserStatus status,
+            Role role,
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    );
 
     AdminUserResponse getUserByIdForAdmin(Long targetUserId);
 

@@ -35,7 +35,9 @@ import com.shariarunix.refind.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +45,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -357,9 +360,28 @@ public class UserServiceImpl implements UserService {
         log.info("Deactivated user ID: {}. Reason: {}", currentUserId, request.getReason());
     }
 
+    private static final Set<String> ALLOWED_ADMIN_SORT_FIELDS = Set.of(
+            "id", "createdAt", "updatedAt", "fullName", "email", "phone", "role", "status"
+    );
+
     @Override
     @Transactional(readOnly = true)
-    public Page<AdminUserResponse> getAllUsersForAdmin(String query, UserStatus status, Role role, Pageable pageable) {
+    public Page<AdminUserResponse> getAllUsersForAdmin(
+            String query,
+            UserStatus status,
+            Role role,
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    ) {
+        int safePage = Math.max(0, page);
+        int safeSize = Math.min(Math.max(1, size), 100);
+
+        String safeSortBy = (sortBy != null && ALLOWED_ADMIN_SORT_FIELDS.contains(sortBy)) ? sortBy : "createdAt";
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDir) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(direction, safeSortBy));
+
         Page<User> users = userRepository.searchUsers(query, status, role, pageable);
         return users.map(this::mapToAdminUserResponse);
     }
