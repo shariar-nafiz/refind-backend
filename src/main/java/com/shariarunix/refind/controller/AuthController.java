@@ -64,6 +64,6 @@ public class AuthController {
         String bearerToken = httpRequest.getHeader("Authorization");
         Long userId = userPrincipal != null ? userPrincipal.getId() : null;
         authService.logout(bearerToken, userId);
-        return ResponseEntity.ok(ApiResponse.ok("Logged out successfully", httpRequest.getRequestURI()));
+        return ResponseEntity.ok(ApiResponse.success("Logged out successfully", httpRequest.getRequestURI()));
     }
 }

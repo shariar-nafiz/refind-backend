@@ -57,6 +57,10 @@ public class SecurityConfig {
                                 "/actuator/**"
                         ).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/*/public").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/locations/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/items/my-items").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/items/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

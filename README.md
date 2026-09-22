@@ -2,6 +2,9 @@
 
 Backend service for **ReFind**, a lost and found platform designed to connect people who have lost items with those who have found them.
 
+> 📖 **Project Proposal & Architecture Roadmap:**  
+> For the complete software architecture, Flyway migration roadmap (`V4` - `V8`), status audit of completed vs. pending modules, and feature designs, see [PROJECT_PLAN_AND_ROADMAP.md](PROJECT_PLAN_AND_ROADMAP.md).
+
 ## 🛠 Tech Stack
 
 - **Language:** Java 21

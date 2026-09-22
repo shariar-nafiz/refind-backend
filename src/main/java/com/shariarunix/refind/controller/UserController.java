@@ -97,7 +97,7 @@ public class UserController {
             HttpServletRequest httpRequest
     ) {
         userService.changePassword(userPrincipal.getId(), request);
-        return ResponseEntity.ok(ApiResponse.ok("Password updated successfully", httpRequest.getRequestURI()));
+        return ResponseEntity.ok(ApiResponse.success("Password updated successfully", httpRequest.getRequestURI()));
     }
 
     @PostMapping(value = "/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -154,7 +154,7 @@ public class UserController {
             HttpServletRequest httpRequest
     ) {
         userService.deleteAddress(userPrincipal.getId(), addressId);
-        return ResponseEntity.ok(ApiResponse.ok("Address deleted successfully", httpRequest.getRequestURI()));
+        return ResponseEntity.ok(ApiResponse.success("Address deleted successfully", httpRequest.getRequestURI()));
     }
 
     // --- Preferences Endpoints ---
@@ -191,7 +191,7 @@ public class UserController {
     ) {
         String bearerToken = httpRequest.getHeader("Authorization");
         userService.deactivateAccount(userPrincipal.getId(), request, bearerToken);
-        return ResponseEntity.ok(ApiResponse.ok("Account deactivated successfully", httpRequest.getRequestURI()));
+        return ResponseEntity.ok(ApiResponse.success("Account deactivated successfully", httpRequest.getRequestURI()));
     }
 
     // --- Public Profile View ---
