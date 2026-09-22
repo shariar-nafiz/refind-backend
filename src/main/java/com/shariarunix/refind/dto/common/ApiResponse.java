@@ -58,7 +58,7 @@ public class ApiResponse<T> {
                 .build();
     }
 
-    public static ApiResponse<Void> ok(String message, String path) {
+    public static ApiResponse<Void> success(String message, String path) {
         return ApiResponse.<Void>builder()
                 .success(true)
                 .message(message)
