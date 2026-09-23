@@ -73,12 +73,14 @@ spring:
       max-request-size: ${UPLOAD_MAX_REQUEST_SIZE:30MB}
       resolve-lazily: false
 
-  # Redis (Upstash compatible)
+  # Redis (Upstash compatible via TCP / Local Docker)
   data:
     redis:
       url: ${REDIS_URL:redis://localhost:6379}
       ssl:
         enabled: ${REDIS_SSL_ENABLED:false}
+      timeout: ${REDIS_TIMEOUT:5000ms}
+      connect-timeout: ${REDIS_CONNECT_TIMEOUT:5000ms}
 
 # ===================================================================
 # Storage Configuration (Local Filesystem)
@@ -95,6 +97,10 @@ storage:
 # Application & Security Configuration
 # ===================================================================
 app:
+  otp:
+    expiration-minutes: ${OTP_EXPIRATION_MINUTES:10}
+    max-attempts: ${OTP_MAX_ATTEMPTS:5}
+    cooldown-seconds: ${OTP_COOLDOWN_SECONDS:60}
   security:
     jwt:
       secret: ${JWT_SECRET:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef}
@@ -122,8 +128,9 @@ resend:
     key: ${RESEND_API_KEY:}
     url: ${RESEND_API_URL:https://api.resend.com}
   from:
-    email: ${RESEND_FROM_EMAIL:no-reply@refind.app}
+    email: ${RESEND_FROM_EMAIL:no-reply@refind.shariarunix.me}
     name: ${RESEND_FROM_NAME:ReFind}
+  dev-mode: ${RESEND_DEV_MODE:false}
 
 # ===================================================================
 # Actuator & Observability
