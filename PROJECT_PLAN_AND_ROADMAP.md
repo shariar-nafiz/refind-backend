@@ -3,11 +3,11 @@
 > **Academic & Production Blueprint**  
 > **Project:** LOST & FOUND (ReFind) — A Lightweight Recovery Platform for Reuniting People with Lost Belongings  
 > **Institution:** Southeast University, Department of Computer Science & Engineering  
-> **Prepared by:** Antigravity (Project Manager & Lead Software Architect)  
+> **Prepared by:** Md Shariar (Project Manager & Lead Software Engineer)  
 > **Project Team:**  
 > - Md Shariar (ID: 2024100010037)  
 > - Md. Rahat Hossain (ID: 2023000010078)  
-> - Meherunnesa Shonagi (ID: 2024100010043)  
+> - Meherunnesa Shohagi (ID: 2024100010043)  
 > - Hamidul Hoque Masum (ID: 2024000010005)  
 > - Arop Sutra Dhar (ID: 2024100010161)  
 > **Project Supervisor:** Mr. Miftahul Sheikh (Adjunct Lecturer, Dept. of CSE, Southeast University)  
