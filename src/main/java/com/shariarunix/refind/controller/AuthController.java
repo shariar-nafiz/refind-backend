@@ -4,6 +4,9 @@ import com.shariarunix.refind.dto.auth.AuthResponse;
 import com.shariarunix.refind.dto.auth.LoginRequest;
 import com.shariarunix.refind.dto.auth.RefreshTokenRequest;
 import com.shariarunix.refind.dto.auth.RegisterRequest;
+import com.shariarunix.refind.dto.auth.RegisterResponse;
+import com.shariarunix.refind.dto.auth.ResendOtpRequest;
+import com.shariarunix.refind.dto.auth.VerifyEmailRequest;
 import com.shariarunix.refind.dto.common.ApiResponse;
 import com.shariarunix.refind.service.AuthService;
 import com.shariarunix.refind.security.UserPrincipal;
@@ -24,17 +27,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authentication", description = "Endpoints for user registration, login, and token refresh")
+@Tag(name = "Authentication", description = "Endpoints for user registration, verification, login, and token refresh")
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/register")
-    @Operation(summary = "Register new user account", description = "Creates a new user profile with email or phone number and returns authentication tokens.")
-    public ResponseEntity<ApiResponse<AuthResponse>> register(@Valid @RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
-        AuthResponse response = authService.register(request);
+    @Operation(summary = "Register new user account", description = "Creates a new user profile with email or phone number and dispatches verification OTP if registered with email.")
+    public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
+        RegisterResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("User registered successfully", response, httpRequest.getRequestURI()));
+                .body(ApiResponse.success(response.getMessage(), response, httpRequest.getRequestURI()));
+    }
+
+    @PostMapping("/verify-email")
+    @Operation(summary = "Verify email with 6-digit OTP", description = "Validates the 6-digit OTP code sent to user email, activates the account, and returns authentication tokens.")
+    public ResponseEntity<ApiResponse<AuthResponse>> verifyEmail(@Valid @RequestBody VerifyEmailRequest request, HttpServletRequest httpRequest) {
+        AuthResponse response = authService.verifyEmail(request);
+        return ResponseEntity.ok(ApiResponse.success("Email verified successfully", response, httpRequest.getRequestURI()));
+    }
+
+    @PostMapping("/resend-otp")
+    @Operation(summary = "Resend verification OTP", description = "Sends a new 6-digit OTP to the user's registered email with rate-limit cooldown.")
+    public ResponseEntity<ApiResponse<Void>> resendOtp(@Valid @RequestBody ResendOtpRequest request, HttpServletRequest httpRequest) {
+        authService.resendOtp(request);
+        return ResponseEntity.ok(ApiResponse.success("Verification code resent successfully. Please check your inbox.", httpRequest.getRequestURI()));
     }
 
     @PostMapping("/login")
